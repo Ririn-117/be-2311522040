@@ -1,7 +1,14 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
-require('dotenv').config({ path: 'konfig.env' });
+const fs = require('fs');
+
+// Konfigurasi dotenv secara cerdas: hanya baca file jika file konfig.env fisik ada di folder
+if (fs.existsSync('konfig.env')) {
+    require('dotenv').config({ path: 'konfig.env' });
+} else {
+    require('dotenv').config(); // Fallback membaca environment variables langsung dari system cloud (GCP)
+}
 
 const app = express();
 app.use(cors());
@@ -15,10 +22,10 @@ app.get('/', (req, res) => {
     });
 });
 
-// Konfigurasi Database Connection Pool menggunakan data dari file konfig.env
+// Konfigurasi Database Connection Pool (Menggunakan nilai default jika port kosong)
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
