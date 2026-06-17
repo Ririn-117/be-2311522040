@@ -146,8 +146,9 @@ app.delete('/items/:id', async (req, res) => {
     }
 });
 
-// Menjalankan Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// Menjalankan Server (Sudah Sinkron 100% untuk GCP Cloud Run & Dockerfile)
+const PORT = process.env.PORT || 8080; 
+
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
