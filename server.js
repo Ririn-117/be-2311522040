@@ -54,21 +54,20 @@ app.get('/health', async (req, res) => {
     }
 });
 
-// 2. ENDPOINT /schema (Membuka formulir 5 kolom lengkap)
+// 2. ENDPOINT /schema (Membuka formulir input ringkas dengan tepat 5 atribut database)
 app.get('/schema', (req, res) => {
     res.status(200).json({
         student: { name: "Ririn Fauzia Rahma", nim: "2311522040" },
         resource: {
             name: "items",            
-            label: "Data Buku",       
-            description: "Aplikasi untuk mengelola data buku"
+            label: "Data Laptop",       
+            description: "Aplikasi ringkas untuk mengelola data laptop kelompok"
         },
         fields: [
-            { name: "title", label: "Judul Buku", type: "text", required: true, showInTable: true },
-            { name: "author", label: "Penulis", type: "text", required: true, showInTable: true },
-            { name: "year", label: "Tahun Terbit", type: "number", required: false, showInTable: true },
-            { name: "category", label: "Kategori", type: "select", options: ["Fiksi", "Non-Fiksi", "Teknologi", "Sejarah"], required: true, showInTable: true },
-            { name: "description", label: "Deskripsi", type: "textarea", required: false, showInTable: true }
+            { name: "brand", label: "Merek (Brand)", type: "text", required: true, showInTable: true },
+            { name: "model", label: "Tipe / Model", type: "text", required: true, showInTable: true },
+            { name: "ram", label: "Kapasitas RAM (GB)", type: "number", required: true, showInTable: true },
+            { name: "price", label: "Harga (Rp)", type: "number", required: true, showInTable: true }
         ],
         endpoints: {
             list: "/items",
@@ -83,7 +82,7 @@ app.get('/schema', (req, res) => {
 // 3. CRUD: GET ALL ITEMS
 app.get('/items', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, title, author, year, category, description FROM books');
+        const [rows] = await pool.query('SELECT id, brand, model, ram, price FROM laptops');
         res.status(200).json({
             status: "success",
             message: "Data retrieved successfully",
@@ -98,7 +97,7 @@ app.get('/items', async (req, res) => {
 // 4. CRUD: GET ITEM BY ID
 app.get('/items/:id', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, title, author, year, category, description FROM books WHERE id = ?', [req.params.id]);
+        const [rows] = await pool.query('SELECT id, brand, model, ram, price FROM laptops WHERE id = ?', [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ status: "error", message: "Item not found" });
         res.status(200).json({ status: "success", data: rows[0] });
     } catch (error) {
@@ -108,16 +107,16 @@ app.get('/items/:id', async (req, res) => {
 
 // 5. CRUD: POST CREATE ITEM
 app.post('/items', async (req, res) => {
-    const { title, author, year, category, description } = req.body;
+    const { brand, model, ram, price } = req.body;
     try {
         const [result] = await pool.query(
-            'INSERT INTO books (title, author, year, category, description) VALUES (?, ?, ?, ?, ?)',
-            [title, author, year ? parseInt(year) : null, category, description || null]
+            'INSERT INTO laptops (brand, model, ram, price) VALUES (?, ?, ?, ?)',
+            [brand, model, parseInt(ram), parseFloat(price)]
         );
         res.status(201).json({
             status: "success",
             message: "Data created successfully",
-            data: { id: result.insertId, title, author, year, category, description }
+            data: { id: result.insertId, brand, model, ram, price }
         });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
@@ -126,17 +125,17 @@ app.post('/items', async (req, res) => {
 
 // 6. CRUD: PUT UPDATE ITEM
 app.put('/items/:id', async (req, res) => {
-    const { title, author, year, category, description } = req.body;
+    const { brand, model, ram, price } = req.body;
     const { id } = req.params;
     try {
         await pool.query(
-            'UPDATE books SET title = ?, author = ?, year = ?, category = ?, description = ? WHERE id = ?',
-            [title, author, year ? parseInt(year) : null, category, description || null, id]
+            'UPDATE laptops SET brand = ?, model = ?, ram = ?, price = ? WHERE id = ?',
+            [brand, model, parseInt(ram), parseFloat(price), id]
         );
         res.status(200).json({
             status: "success",
             message: "Data updated successfully",
-            data: { id: parseInt(id), title, author, year, category, description }
+            data: { id: parseInt(id), brand, model, ram, price }
         });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
@@ -146,7 +145,7 @@ app.put('/items/:id', async (req, res) => {
 // 7. CRUD: DELETE ITEM
 app.delete('/items/:id', async (req, res) => {
     try {
-        await pool.query('DELETE FROM books WHERE id = ?', [req.params.id]);
+        await pool.query('DELETE FROM laptops WHERE id = ?', [req.params.id]);
         res.status(200).json({ status: "success", message: "Data deleted successfully" });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
