@@ -54,13 +54,13 @@ app.get('/health', async (req, res) => {
     }
 });
 
-// 2. ENDPOINT /schema (Membuka formulir input ringkas dengan tepat 5 atribut database)
+// 2. ENDPOINT /schema (Membuka formulir input ringkas dengan tepat 4 atribut database laptop)
 app.get('/schema', (req, res) => {
     res.status(200).json({
         student: { name: "Ririn Fauzia Rahma", nim: "2311522040" },
         resource: {
-            name: "items",            
-            label: "Data Laptop",       
+            name: "laptops",            
+            label: "Daftar Laptop",       
             description: "Aplikasi ringkas untuk mengelola data laptop kelompok"
         },
         fields: [
@@ -70,17 +70,17 @@ app.get('/schema', (req, res) => {
             { name: "price", label: "Harga (Rp)", type: "number", required: true, showInTable: true }
         ],
         endpoints: {
-            list: "/items",
-            detail: "/items/{id}",
-            create: "/items",
-            update: "/items/{id}",
-            delete: "/items/{id}"
+            list: "/laptops",
+            detail: "/laptops/{id}",
+            create: "/laptops",
+            update: "/laptops/{id}",
+            delete: "/laptops/{id}"
         }
     });
 });
 
-// 3. CRUD: GET ALL ITEMS
-app.get('/items', async (req, res) => {
+// 3. CRUD: GET ALL LAPTOPS
+app.get('/laptops', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT id, brand, model, ram, price FROM laptops');
         res.status(200).json({
@@ -94,19 +94,19 @@ app.get('/items', async (req, res) => {
     }
 });
 
-// 4. CRUD: GET ITEM BY ID
-app.get('/items/:id', async (req, res) => {
+// 4. CRUD: GET LAPTOP BY ID
+app.get('/laptops/:id', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT id, brand, model, ram, price FROM laptops WHERE id = ?', [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ status: "error", message: "Item not found" });
+        if (rows.length === 0) return res.status(404).json({ status: "error", message: "Laptop not found" });
         res.status(200).json({ status: "success", data: rows[0] });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
     }
 });
 
-// 5. CRUD: POST CREATE ITEM
-app.post('/items', async (req, res) => {
+// 5. CRUD: POST CREATE LAPTOP
+app.post('/laptops', async (req, res) => {
     const { brand, model, ram, price } = req.body;
     try {
         const [result] = await pool.query(
@@ -123,8 +123,8 @@ app.post('/items', async (req, res) => {
     }
 });
 
-// 6. CRUD: PUT UPDATE ITEM
-app.put('/items/:id', async (req, res) => {
+// 6. CRUD: PUT UPDATE LAPTOP
+app.put('/laptops/:id', async (req, res) => {
     const { brand, model, ram, price } = req.body;
     const { id } = req.params;
     try {
@@ -142,8 +142,8 @@ app.put('/items/:id', async (req, res) => {
     }
 });
 
-// 7. CRUD: DELETE ITEM
-app.delete('/items/:id', async (req, res) => {
+// 7. CRUD: DELETE LAPTOP
+app.delete('/laptops/:id', async (req, res) => {
     try {
         await pool.query('DELETE FROM laptops WHERE id = ?', [req.params.id]);
         res.status(200).json({ status: "success", message: "Data deleted successfully" });
