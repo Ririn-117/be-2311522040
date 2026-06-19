@@ -7,7 +7,7 @@ const fs = require('fs');
 if (fs.existsSync('konfig.env')) {
     require('dotenv').config({ path: 'konfig.env' });
 } else {
-    require('dotenv').config(); // Fallback membaca environment variables langsung dari system cloud (GCP)
+    require('dotenv').config(); 
 }
 
 const app = express();
